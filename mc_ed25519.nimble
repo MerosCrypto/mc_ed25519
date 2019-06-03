@@ -1,6 +1,6 @@
-version     = "1.0.0"
+version     = "1.1.0"
 author      = "Luke Parker"
-description = "A Nim Wrapper for LibSodium's Ed25519 components."
+description = "A Nim Wrapper for orlp's Ed25519 library."
 license     = "MIT"
 
 installFiles = @[
@@ -8,7 +8,7 @@ installFiles = @[
 ]
 
 installDirs = @[
-    "libsodium"
+    "ed25519"
 ]
 
 requires "nim > 0.18.0"

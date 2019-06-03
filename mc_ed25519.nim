@@ -1,62 +1,68 @@
-#Include and link Sodium.
+#Include and link the Ed25519 library.
 const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 15)
-{.passC: "-I" & currentFolder & "libsodium/".}
-{.passL: "-lsodium".}
+
+{.passC: "-I" & currentFolder & "ed25519/src/".}
+{.emit: """
+extern "C" {
+#include "ed25519.h"
+#include "ge.h"
+}
+""".}
+
+{.compile: currentFolder & "ed25519/src/ge.c".}
+{.compile: currentFolder & "ed25519/src/sign.c".}
+{.compile: currentFolder & "ed25519/src/verify.c".}
+{.compile: currentFolder & "ed25519/src/add_scalar.c".}
+{.compile: currentFolder & "ed25519/src/fe.c".}
+{.compile: currentFolder & "ed25519/src/key_exchange.c".}
+{.compile: currentFolder & "ed25519/src/keypair.c".}
+{.compile: currentFolder & "ed25519/src/sc.c".}
+{.compile: currentFolder & "ed25519/src/seed.c".}
+{.compile: currentFolder & "ed25519/src/sha512.c".}
 
 #Define the Ed25519 objects.
 type
-    Seed* = array[32, cuchar]
+    FE* {.
+        header: "fe.h",
+        importc: "fe"
+    .} = array[10, int32]
+    Point* {.
+        header: "ge.h",
+        importc: "ge_p3"
+    .} = object
+        x: FE
+        y: FE
+        Z: FE
+        T: FE
     PrivateKey* = array[64, cuchar]
     PublicKey* = array[32, cuchar]
-    State* {.
-        header: "sodium.h",
-        importc: "crypto_sign_ed25519ph_state"
-    .} = object
 
-#Multiply a point in a char array against the base point and store it in the provided point.
+#Multiply by Ed25519's base.
 proc multiplyBase*(
-    output: ptr cuchar,
-    input: ptr cuchar
-) {.
-    header: "sodium.h",
-    importc: "crypto_scalarmult_ed25519_base"
-.}
+    res: ptr Point,
+    point: ptr cuchar
+) {.importc: "ge_scalarmult_base".}
 
-#Init a state.
-proc init*(
-    state: ptr State
-): int {.
-    header: "sodium.h",
-    importc: "crypto_sign_ed25519ph_init"
-.}
+#Serialize a point.
+proc serialize*(
+    res: ptr cuchar,
+    point: ptr Point
+) {.importc: "ge_p3_tobytes".}
 
-#Update a state.
-proc update*(
-    state: ptr State,
-    msg: ptr char,
-    len: culong
-): int {.
-    header: "sodium.h",
-    importc: "crypto_sign_ed25519ph_update"
-.}
 
 #Sign a message.
 proc sign*(
-    state: ptr State,
-    sig: ptr char,
-    len: ptr culong,
-    priv: PrivateKey
-): int {.
-    header: "sodium.h",
-    importc: "crypto_sign_ed25519ph_final_create"
-.}
+    sig: ptr cuchar,
+    msg: ptr cuchar,
+    msgLen: csize,
+    pubKey: ptr cuchar,
+    privKey: ptr cuchar
+) {.importc: "ed25519_sign".}
 
 #Verify a message.
 proc verify*(
-    state: ptr State,
-    sig: ptr char,
-    pub: PublicKey
-): int {.
-    header: "sodium.h",
-    importc: "crypto_sign_ed25519ph_final_verify"
-.}
+    sig: ptr cuchar,
+    msg: ptr cuchar,
+    msgLen: csize,
+    pubKey: ptr cuchar
+): int {.importc: "ed25519_verify".}

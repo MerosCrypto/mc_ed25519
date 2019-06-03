@@ -1,10 +1,10 @@
-The bundled LibSodium header files are under the ISC License, copyright (2013-2018) Frank Denis <j at pureftpd dot org>. Please see the `libsodium` folder for the full `LICENSE` text.
+The bundled Ed25519 library are under the ZLib License, copyright (c) 2015 Orson Peters <orsonpeters@gmail.com>. Please see the `ed25519` folder for the full `license.txt` text.
 
-The Nim Wrapper around LibSodium's Ed25519 components is released under the following license:
+The Nim Wrapper around orlp's Ed25519 library is released under the following license:
 
 The MIT License (MIT)
 
-Copyright (c) 2018 Luke Parker
+Copyright (c) 2018-2019 Luke Parker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
