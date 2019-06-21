@@ -49,7 +49,6 @@ proc serialize*(
     point: ptr Point
 ) {.importc: "ge_p3_tobytes".}
 
-
 #Sign a message.
 proc sign*(
     sig: ptr cuchar,
@@ -57,7 +56,7 @@ proc sign*(
     msgLen: csize,
     pubKey: ptr cuchar,
     privKey: ptr cuchar
-) {.importc: "ed25519_sign".}
+) {.importc: "ed25519_sign", header: "ed25519.h".}
 
 #Verify a message.
 proc verify*(
@@ -65,4 +64,4 @@ proc verify*(
     msg: ptr cuchar,
     msgLen: csize,
     pubKey: ptr cuchar
-): int {.importc: "ed25519_verify".}
+): int {.importc: "ed25519_verify", header: "ed25519.h".}
