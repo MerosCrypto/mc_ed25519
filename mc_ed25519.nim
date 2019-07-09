@@ -9,16 +9,16 @@ extern "C" {
 }
 """.}
 
-{.compile: currentFolder & "ed25519/src/ge.c".}
-{.compile: currentFolder & "ed25519/src/sign.c".}
-{.compile: currentFolder & "ed25519/src/verify.c".}
 {.compile: currentFolder & "ed25519/src/add_scalar.c".}
 {.compile: currentFolder & "ed25519/src/fe.c".}
+{.compile: currentFolder & "ed25519/src/ge.c".}
 {.compile: currentFolder & "ed25519/src/key_exchange.c".}
 {.compile: currentFolder & "ed25519/src/keypair.c".}
 {.compile: currentFolder & "ed25519/src/sc.c".}
 {.compile: currentFolder & "ed25519/src/seed.c".}
 {.compile: currentFolder & "ed25519/src/sha512.c".}
+{.compile: currentFolder & "ed25519/src/sign.c".}
+{.compile: currentFolder & "ed25519/src/verify.c".}
 
 #Define the Ed25519 objects.
 type
@@ -68,7 +68,7 @@ proc add*(
 proc multiplyBase*(
     res: ptr Point3,
     point: ptr cuchar
-) {.importc: "ge_scalarmult".}
+) {.importc: "ge_scalarmult_base".}
 
 #Multiply scalars.
 proc multiplyScalar*(
@@ -97,7 +97,7 @@ proc sign*(
     msgLen: csize,
     pubKey: ptr cuchar,
     privKey: ptr cuchar
-) {.importc: "ed25519_sign", header: "ed25519.h".}
+) {.importc: "ed25519_sign".}
 
 #Verify a message.
 proc verify*(
@@ -105,4 +105,4 @@ proc verify*(
     msg: ptr cuchar,
     msgLen: csize,
     pubKey: ptr cuchar
-): int {.importc: "ed25519_verify", header: "ed25519.h".}
+): int {.importc: "ed25519_verify".}
