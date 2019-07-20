@@ -6,6 +6,7 @@ const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 15
 extern "C" {
 #include "ed25519.h"
 #include "ge.h"
+#include "sc.h"
 }
 """.}
 
@@ -69,6 +70,11 @@ proc multiplyBase*(
     res: ptr Point3,
     point: ptr cuchar
 ) {.importc: "ge_scalarmult_base".}
+
+#Reduce a scalar.
+proc reduceScalar*(
+    scalar: ptr cuchar
+) {.importc: "sc_reduce".}
 
 #Multiply scalars.
 proc multiplyScalar*(
