@@ -2,13 +2,6 @@
 const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 15)
 
 {.passC: "-I" & currentFolder & "ed25519/src/".}
-{.emit: """
-extern "C" {
-#include "ed25519.h"
-#include "ge.h"
-#include "sc.h"
-}
-""".}
 
 {.compile: currentFolder & "ed25519/src/add_scalar.c".}
 {.compile: currentFolder & "ed25519/src/fe.c".}
@@ -20,6 +13,8 @@ extern "C" {
 {.compile: currentFolder & "ed25519/src/sha512.c".}
 {.compile: currentFolder & "ed25519/src/sign.c".}
 {.compile: currentFolder & "ed25519/src/verify.c".}
+
+{.push header: "ge.h".}
 
 #Define the Ed25519 objects.
 type
@@ -39,8 +34,14 @@ type
         header: "ge.h",
         importc: "ge_cached"
     .} = object
+
+{.pop.}
+
+type
     PrivateKey* = array[64, cuchar]
     PublicKey* = array[32, cuchar]
+
+{.push header: "ge.h".}
 
 #Convert a Public Key to a Point3.
 proc keyToNegativePoint*(
@@ -71,11 +72,6 @@ proc multiplyBase*(
     point: ptr cuchar
 ) {.importc: "ge_scalarmult_base".}
 
-#Reduce a scalar.
-proc reduceScalar*(
-    scalar: ptr cuchar
-) {.importc: "sc_reduce".}
-
 #Multiply scalars.
 proc multiplyScalar*(
     res: ptr Point2,
@@ -96,6 +92,15 @@ proc serialize*(
     point: ptr Point3
 ) {.importc: "ge_p3_tobytes".}
 
+{.pop.}
+
+#Reduce a scalar.
+proc reduceScalar*(
+    scalar: ptr cuchar
+) {.importc: "sc_reduce", header: "sc.h".}
+
+{.push header: "ed25519.h".}
+
 #Sign a message.
 proc sign*(
     sig: ptr cuchar,
@@ -112,3 +117,5 @@ proc verify*(
     msgLen: csize,
     pubKey: ptr cuchar
 ): int {.importc: "ed25519_verify".}
+
+{.pop.}
