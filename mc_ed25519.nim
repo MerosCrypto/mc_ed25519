@@ -14,108 +14,115 @@ const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 15
 {.compile: currentFolder & "ed25519/src/sign.c".}
 {.compile: currentFolder & "ed25519/src/verify.c".}
 
+type
+  PrivateKey* = array[64, cuchar]
+  PublicKey* = array[32, cuchar]
+
+{.push header: "sc.h".}
+
+proc mulAdd*(
+  res: ptr cuchar,
+  a: ptr cuchar,
+  b: ptr cuchar,
+  c: ptr cuchar
+) {.importc: "sc_muladd".}
+
+#Reduce a scalar.
+proc reduceScalar*(
+  scalar: ptr cuchar
+) {.importc: "sc_reduce".}
+
+{.pop.}
+
 {.push header: "ge.h".}
 
 #Define the Ed25519 objects.
 type
-    PointP1P1* {.
-        header: "ge.h",
-        importc: "ge_p1p1"
-    .} = object
-    Point2* {.
-        header: "ge.h",
-        importc: "ge_p2"
-    .} = object
-    Point3* {.
-        header: "ge.h",
-        importc: "ge_p3"
-    .} = object
-    PointCached* {.
-        header: "ge.h",
-        importc: "ge_cached"
-    .} = object
-
-{.pop.}
-
-type
-    PrivateKey* = array[64, cuchar]
-    PublicKey* = array[32, cuchar]
-
-{.push header: "ge.h".}
+  PointP1P1* {.
+    header: "ge.h",
+    importc: "ge_p1p1"
+  .} = object
+  Point2* {.
+    header: "ge.h",
+    importc: "ge_p2"
+  .} = object
+  Point3* {.
+    header: "ge.h",
+    importc: "ge_p3"
+  .} = object
+  PointCached* {.
+    header: "ge.h",
+    importc: "ge_cached"
+  .} = object
 
 #Convert a Public Key to a Point3.
 proc keyToNegativePoint*(
-    res: ptr Point3,
-    bytes: ptr cuchar
+  res: ptr Point3,
+  bytes: ptr cuchar
 ) {.importc: "ge_frombytes_negate_vartime".}
 
 proc p3ToCached*(
-    cached: ptr PointCached,
-    p3: ptr Point3
+  cached: ptr PointCached,
+  p3: ptr Point3
 ) {.importc: "ge_p3_to_cached".}
 
 proc p1p1ToP3*(
-    p3: ptr Point3,
-    p1p1: ptr PointP1P1
+  p3: ptr Point3,
+  p1p1: ptr PointP1P1
 ) {.importc: "ge_p1p1_to_p3".}
 
 #Add two points.
 proc add*(
-    res: ptr PointP1P1,
-    p: ptr Point3,
-    p2: ptr PointCached
+  res: ptr PointP1P1,
+  p: ptr Point3,
+  p2: ptr PointCached
 ) {.importc: "ge_add".}
 
 #Multiply by Ed25519's base.
 proc multiplyBase*(
-    res: ptr Point3,
-    point: ptr cuchar
+  res: ptr Point3,
+  point: ptr cuchar
 ) {.importc: "ge_scalarmult_base".}
 
 #Multiply scalars.
 proc multiplyScalar*(
-    res: ptr Point2,
-    scalar: ptr cuchar,
-    point: ptr Point3,
-    addScalar: ptr cuchar
+  res: ptr Point2,
+  scalar: ptr cuchar,
+  point: ptr Point3,
+  addScalar: ptr cuchar
 ) {.importc: "ge_double_scalarmult_vartime".}
 
 #Serialize a Point2.
 proc serialize*(
-    res: ptr cuchar,
-    point2: ptr Point2
+  res: ptr cuchar,
+  point2: ptr Point2
 ) {.importc: "ge_tobytes".}
 
 #Serialize a Point3.
 proc serialize*(
-    res: ptr cuchar,
-    point: ptr Point3
+  res: ptr cuchar,
+  point: ptr Point3
 ) {.importc: "ge_p3_tobytes".}
 
 {.pop.}
-
-#Reduce a scalar.
-proc reduceScalar*(
-    scalar: ptr cuchar
-) {.importc: "sc_reduce", header: "sc.h".}
 
 {.push header: "ed25519.h".}
 
 #Sign a message.
 proc sign*(
-    sig: ptr cuchar,
-    msg: ptr cuchar,
-    msgLen: csize,
-    pubKey: ptr cuchar,
-    privKey: ptr cuchar
+  sig: ptr cuchar,
+  msg: ptr cuchar,
+  msgLen: csize,
+  pubKey: ptr cuchar,
+  privKey: ptr cuchar
 ) {.importc: "ed25519_sign".}
 
 #Verify a message.
 proc verify*(
-    sig: ptr cuchar,
-    msg: ptr cuchar,
-    msgLen: csize,
-    pubKey: ptr cuchar
+  sig: ptr cuchar,
+  msg: ptr cuchar,
+  msgLen: csize,
+  pubKey: ptr cuchar
 ): int {.importc: "ed25519_verify".}
 
 {.pop.}

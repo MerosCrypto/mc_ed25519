@@ -1,14 +1,14 @@
-version     = "1.0.1"
+version     = "1.1.1"
 author      = "Luke Parker"
 description = "A Nim Wrapper for orlp's Ed25519 library."
 license     = "MIT"
 
 installFiles = @[
-    "mc_ed25519.nim"
+  "mc_ed25519.nim"
 ]
 
 installDirs = @[
-    "ed25519"
+  "ed25519"
 ]
 
 requires "nim > 0.18.0"
